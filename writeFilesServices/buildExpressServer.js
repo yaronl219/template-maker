@@ -1,15 +1,18 @@
 const { createZip } = require('./compressDir');
 const { writeServerJsFile } = require('./writeServer');
 const { writePackageJsonFile } = require('./writePackage');
-const { createDir } = require('./writeFile');
+const { createDir, removeFile, removeDir } = require('./fileServices');
 const { createConfig } = require('./writeConfig');
 const { createServices } = require('./services/writeServices');
 const { createMiddleware } = require('./writeMiddleware');
 const { createApis } = require('./APIs/writeApis');
 
-// to be later replaced by a json file
+module.exports = {
+    buildExpressServer
+}
+// // to be later replaced by a json file
 optionsObject = {
-    projectName: 'express-template-maker',
+    projectName: 'my-project',
     projectAuthor: 'Yaron Lipshitz',
     serveStatic: true,
     frontendPort: 3000,
@@ -31,7 +34,7 @@ optionsObject = {
     // },
     hasLogin: false,
     APIs: {
-        templates: {
+        products: {
             // collectionName: 'products',
             crudOperations: {
                 create: {
@@ -49,28 +52,42 @@ optionsObject = {
     }
 }
 
-buildExpressServer(optionsObject)
-
 async function buildExpressServer(options) {
     const startTime = Date.now()
-    // TODO - replace 1 with timestamp
-    const projectName = `${options.projectName}-${1}`
-    const projectDir = await createDir(`../output/tmp`, projectName)
+    // console.log('dirname',__dirname)
+
+    const projectName = `${options.projectName}-${startTime}`
+    const projectDir = await createDir(`./output/tmp`, projectName)
+try {
 
     const hasMongo = !!Object.values(options.mongoConnection).length
-
+    
     const shouldCreateAPIs = options.hasLogin || Object.values(options.APIs).length
+    
+    const prms = []
+    prms.push(writeServerJsFile(projectDir, options))
+    prms.push(writePackageJsonFile(projectDir, options.projectName, options.projectAuthor, hasMongo, options.hasLogin))
+    prms.push(createConfig(projectDir, options.mongoConnection))
+    prms.push(createServices(projectDir, hasMongo))
+    if (options.hasLogin) prms.push(createMiddleware(projectDir))
+    if (shouldCreateAPIs) prms.push(createApis(projectDir, hasMongo, options.hasLogin, options.APIs))
+    await Promise.all(prms)
+    
+    const zipPath = await createZip(projectDir, projectName)
+    console.log('finished process in', Date.now() - startTime, 'ms')   
+    _removeDirAndZip(zipPath,projectDir,1)
+    return zipPath
+} catch (err) {
+    console.log(err)
+    removeDir(projectDir)
+}
 
-    await writeServerJsFile(projectDir, options)
-    await writePackageJsonFile(projectDir, options.projectName, options.projectAuthor, hasMongo, options.hasLogin)
-    await createConfig(projectDir, options.mongoConnection)
-    await createServices(projectDir, hasMongo)
-    if (options.hasLogin) await createMiddleware(projectDir)
-    if (shouldCreateAPIs) await createApis(projectDir, hasMongo, options.hasLogin, options.APIs)
+}
 
-    // TODO - turn this to promise all then create zip
-    await createZip(projectDir, projectName)
-    console.log('finished process in', Date.now() - startTime, 'ms')
-
+function _removeDirAndZip(zipPath,dirPath,minutesDelay) {
+    setTimeout(() => {
+        removeDir(dirPath),
+        removeFile(zipPath)
+    }, minutesDelay*60*1000)
 }
 

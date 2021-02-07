@@ -1,9 +1,12 @@
 import React from 'react'
 
-export function ProjectSummary() {
+export function ProjectSummary({onDownload}) {
+    
     return (
         <div>
-            Summary
+            <button onClick={onDownload}>
+                Download
+            </button>
         </div>
     )
 }

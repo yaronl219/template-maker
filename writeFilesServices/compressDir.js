@@ -7,7 +7,8 @@ module.exports = {
 
 function createZip(projectDir,projectName) {
     return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(`../tmp/${projectName}.zip`);
+        const outputPath = `./tmp/${projectName}.zip`
+        const output = fs.createWriteStream(outputPath);
         const archive = archiver('zip', {
             zlib: { level: 9 } // Sets the compression level.
         });
@@ -16,7 +17,7 @@ function createZip(projectDir,projectName) {
         output.on('close', function () {
             console.log(archive.pointer() + ' total bytes');
             console.log('archiver has been finalized and the output file descriptor has closed.');
-            resolve('true')
+            resolve(outputPath)
         });
 
         // This event is fired when the data source is drained no matter what was the data source.
@@ -38,10 +39,11 @@ function createZip(projectDir,projectName) {
 
         // good practice to catch this error explicitly
         archive.on('error', function (err) {
+            reject(err)
             throw err;
         });
         archive.pipe(output);
-        archive.directory(projectDir, projectDir);
+        archive.directory(projectDir, projectName);
         archive.finalize();
     })
 }

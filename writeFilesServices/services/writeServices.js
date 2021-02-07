@@ -1,4 +1,4 @@
-const { writeFile, createDir } = require('../writeFile')
+const { writeFile, createDir } = require('../fileServices')
 const { createLoggerService } = require('./writeLoggerService')
 const { createMongoService } = require('./writeMongoService')
 

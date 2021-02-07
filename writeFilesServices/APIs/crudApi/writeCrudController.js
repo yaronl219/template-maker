@@ -1,4 +1,4 @@
-const { writeFile } = require("../../writeFile")
+const { writeFile } = require("../../fileServices")
 const { capText } = require('../../../services/utilServices')
 module.exports = {
     createCrudController

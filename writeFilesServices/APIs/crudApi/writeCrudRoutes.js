@@ -1,4 +1,4 @@
-const { writeFile } = require("../../writeFile")
+const { writeFile } = require("../../fileServices")
 const { capText } = require('../../../services/utilServices')
 
 module.exports = {
@@ -61,7 +61,7 @@ function _getAuthString(operation) {
 
 function _getRequireAuth(crudOperations) {
     for (const operation in crudOperations) {
-        if (crudOperations[operation].requiresAuth) {
+        if (crudOperations[operation]?.requiresAuth) {
             // if any item requires auth
             return `const {requireAuth, requireAdmin} = require('../../middlewares/requireAuth.middleware')`
         }
@@ -83,6 +83,6 @@ function _getImports(crudOperations,apiName) {
         importArry.push(operationMap[operaion]) 
     }
     
-    return `const {${moduleExportArray.toString()}} = require(${apiName}.controller)`
+    return `const {${moduleExportArray.toString()}} = require('./${apiName}.controller')`
     
 }

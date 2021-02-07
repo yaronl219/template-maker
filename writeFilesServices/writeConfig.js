@@ -1,4 +1,4 @@
-const { writeFile, createDir } = require('./writeFile')
+const { writeFile, createDir } = require('./fileServices')
 
 module.exports = {
     createConfig

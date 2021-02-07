@@ -1,4 +1,4 @@
-const { createDir } = require('../writeFile')
+const { createDir } = require('../fileServices')
 const { createAuthApi } = require('./writeAuthApi')
 const { createCrudApi } = require('./crudApi/writeCrudApi')
 

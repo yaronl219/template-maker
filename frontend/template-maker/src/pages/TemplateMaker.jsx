@@ -4,17 +4,18 @@ import { connect } from 'react-redux';
 import { Stepper, Step, StepLabel, Button } from '@material-ui/core';
 
 import { GeneralSettings } from '../cmps/GeneralSettings';
-import FrontendSettings from '../cmps/FrontendSettings';
-import { MongoSettings } from '../cmps/MongoSettings';
-import { RoutesSettings } from '../cmps/RoutesSettings';
+import { FrontendSettings } from '../cmps/FrontendSettings';
+import { MongoSettings } from '../cmps/MongoConnection/MongoSettings';
+import { RoutesContainer } from '../cmps/RoutesCmps/RoutesContainer';
 import { ProjectSummary } from '../cmps/ProjectSummary';
-import { setProjectGeneralDetails } from '../store/actions/expressProjectSettingsActions';
+import { setProjectGeneralDetails, setProjectFrontendSettings, setProjectMongoSettings, setProjectApiSettings } from '../store/actions/expressProjectSettingsActions';
+import { downloadService } from '../services/downloadService';
 
 
 
 function _TemplateMaker(props) {
 
-    const {projectSettings} = props
+    const { projectSettings } = props
 
     const [activeStep, setActiveStep] = useState(0);
     const [lastCompletedStep, setLastCompletedStep] = useState(-1)
@@ -22,7 +23,7 @@ function _TemplateMaker(props) {
     const steps = ['General', 'Frontend', 'mongoDB', 'API routes', 'Summary']
 
     const handleNext = () => {
-        
+
         if (activeStep > lastCompletedStep) return
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
@@ -36,17 +37,36 @@ function _TemplateMaker(props) {
     };
 
     function onCompleteGeneralSettings(projectName, projectAuthor) {
-        console.log('template maker completed general settings')
-        props.setProjectGeneralDetails(projectName,projectAuthor)
+        props.setProjectGeneralDetails(projectName, projectAuthor)
         setLastCompletedStep(0)
+    }
+
+    function onCompleteFrontendSettings(serveStatic, frontendPort = null, frontendFolder = null, hasLogin = null) {
+        props.setProjectFrontendSettings(serveStatic, frontendPort, frontendFolder, hasLogin)
+        setLastCompletedStep(1)
+    }
+
+    function onCompleteMongoSettings(data) {
+        props.setProjectMongoSettings(data)
+        setLastCompletedStep(2)
+    }
+
+    function onCompleteApiSettings(data) {
+        props.setProjectApiSettings(data)
+        setLastCompletedStep(3)
+    }
+
+    async function onDownload() {
+        // TODO : add loader
+        await downloadService.downloadZip(projectSettings)
     }
 
     function renderStep() {
         const screens = [<GeneralSettings projectSettings={projectSettings} onComplete={onCompleteGeneralSettings} />,
-        <FrontendSettings projectSettings={projectSettings} />,
-        <MongoSettings projectSettings={projectSettings} onComplete={() => setLastCompletedStep(2)} />,
-        <RoutesSettings projectSettings={projectSettings} onComplete={() => setLastCompletedStep(3)} />,
-        <ProjectSummary projectSettings={projectSettings} onComplete={() => setLastCompletedStep(4)} />
+        <FrontendSettings projectSettings={projectSettings} onComplete={onCompleteFrontendSettings} />,
+        <MongoSettings projectSettings={projectSettings} onComplete={onCompleteMongoSettings} />,
+        <RoutesContainer projectSettings={projectSettings} onComplete={onCompleteApiSettings} />,
+        <ProjectSummary projectSettings={projectSettings} onDownload={onDownload} />
         ]
         return screens[activeStep]
     }
@@ -84,10 +104,13 @@ const mapStateToProps = (state) => ({
     projectSettings: state.expressProjectSettingsReducer
 })
 const mapDispatchToProps = {
-    setProjectGeneralDetails
+    setProjectGeneralDetails,
+    setProjectFrontendSettings,
+    setProjectMongoSettings,
+    setProjectApiSettings
 }
 
-export const TemplateMaker = connect(mapStateToProps,mapDispatchToProps)(_TemplateMaker)
+export const TemplateMaker = connect(mapStateToProps, mapDispatchToProps)(_TemplateMaker)
 
 // optionsObject = {
 //     projectName: 'express-template-maker',

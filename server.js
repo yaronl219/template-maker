@@ -19,13 +19,13 @@ app.use(session({
 }))
 
 
-app.use(express.static(path.resolve(__dirname, public)));
+app.use(express.static(path.resolve(__dirname, 'public')));
 app.get('/**', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
     const corsOptions = {
         origin: ['http://127.0.0.1:3000', 'http://localhost:3000'],
         credentials: true
@@ -38,7 +38,9 @@ app.use('/api/templates', templatesRoutes)
 
 const logger = require('./services/logger.service')
 const port = process.env.PORT || 3030;
+console.log(process.env.NODE_ENV)
 http.listen(port, () => {
     logger.info('Server is running on port: ' + port)
+    
 });
 

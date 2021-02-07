@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { writeFile } = require('./writeFile');
+const { writeFile } = require('./fileServices');
 
 module.exports = {
     writePackageJsonFile

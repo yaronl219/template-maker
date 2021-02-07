@@ -1,16 +1,17 @@
 const templatesService = require('./templates.service')
     const logger = require('../../services/logger.service')
 
-    module.exports = {addTemplate}
+    module.exports = {downloadZip}
     
     
 
     // Create
     
-    async function addTemplate(req, res) {
+    async function downloadZip(req, res) {
         try {
-            const template = await templatesService.add(req.body)
-            res.send(template)
+            const file = await templatesService.createTemplateAndGetZip(req.body)
+            console.log('filepath', file)
+            res.download(file)
         } catch (err) {
             console.log(err)
             res.status(500).send('server error')

@@ -1,5 +1,5 @@
 
-const { createDir } = require("../../writeFile")
+const { createDir } = require("../../fileServices")
 const { createCrudController } = require("./writeCrudController")
 const { createCrudRoutes } = require("./writeCrudRoutes")
 const { createCrudService } = require("./writeCrudService")

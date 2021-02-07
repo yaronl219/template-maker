@@ -1,5 +1,5 @@
 const { makeId } = require("../services/utilServices")
-const { writeFile } = require("./writeFile");
+const { writeFile } = require("./fileServices");
 
 module.exports = {
     writeServerJsFile
@@ -62,7 +62,7 @@ function _getApiRoutes(hasLogin,apis) {
 
 function _getServeStatic(frontendFolder) {
     return `
-    app.use(express.static(path.resolve(__dirname, ${frontendFolder})));
+    app.use(express.static(path.resolve(__dirname, '${frontendFolder}')));
     app.get('/**', (req, res) => {
         res.sendFile(path.join(__dirname, '${frontendFolder}', 'index.html'));
     })

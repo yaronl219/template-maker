@@ -1,4 +1,4 @@
-const { createDir, writeFile } = require("../writeFile")
+const { createDir, writeFile } = require("../fileServices")
 
 module.exports = {
     createAuthApi

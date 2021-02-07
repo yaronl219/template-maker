@@ -19,6 +19,17 @@ export function expressProjectSettingsReducer(state = initialState, action) {
                 frontendFolder,
                 hasLogin
             }
+        case 'SET_MONGO_CONNECTION':
+            return {
+                ...state,
+                mongoConnection: action.mongoConnection
+            }
+        case 'SET_API_ROUTES':
+            console.log(action.APIs)
+            return {
+                ...state,
+                APIs: action.APIs
+            }
         default:
             return state
     }
